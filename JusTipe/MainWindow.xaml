@@ -19,7 +19,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Content="Save" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="40" Click="Save_Click"/>
+            <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="40" Click="Save_Click"/>
             <Button Content="Clear" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="40" Grid.Column="1" Click="Clear_Click"/>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
@@ -40,6 +40,6 @@
             <Button Content="Exit" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="40" Click="Exit_Click" Grid.Column="4"/>
         </Grid>
 
-        <TextBox x:Name="MainText" HorizontalAlignment="Left" Height="535" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="780" Grid.Row="1" TextChanged="MainText_TextChanged"/>
+        <TextBox x:Name="MainText" HorizontalAlignment="Left" Height="535" Margin="10,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="780" Grid.Row="1" TextChanged="MainText_TextChanged" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
     </Grid>
 </Window>

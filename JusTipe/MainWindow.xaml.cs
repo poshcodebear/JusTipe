@@ -49,6 +49,7 @@ namespace JusTipe
             RunningTimer.Tick += new EventHandler(OnTick);
             running = false;
             complete = false;
+            SaveButton.IsEnabled = false;
 
             safetext = "";
 
@@ -67,7 +68,8 @@ namespace JusTipe
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            MainText.Text = "";
+            safetext = "";
+            Clear(false);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -81,23 +83,27 @@ namespace JusTipe
 
         private void MainText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (running)
+            if (MainText.Text != "")
             {
-                countCurrent = countSetting;
-                txtCountdown.Text = Convert.ToString(countCurrent);
-            }
-            else
-            {
-                running = true;
-                complete = false;
-                txtProgTimer.IsEnabled = false;
-                txtCountdown.IsEnabled = false;
-                progSetting = Convert.ToInt32(txtProgTimer.Text);
-                countSetting = Convert.ToInt32(txtCountdown.Text);
-                progCurrent = progSetting;
-                countCurrent = countSetting;
+                if (running)
+                {
+                    countCurrent = countSetting;
+                    txtCountdown.Text = Convert.ToString(countCurrent);
+                }
+                else
+                {
+                    running = true;
+                    complete = false;
+                    txtProgTimer.IsEnabled = false;
+                    txtCountdown.IsEnabled = false;
+                    progSetting = Convert.ToInt32(txtProgTimer.Text);
+                    countSetting = Convert.ToInt32(txtCountdown.Text);
+                    progCurrent = progSetting;
+                    countCurrent = countSetting;
+                    SaveButton.IsEnabled = false;
 
-                RunningTimer.IsEnabled = true;
+                    RunningTimer.IsEnabled = true;
+                }
             }
         }
 
@@ -126,7 +132,11 @@ namespace JusTipe
             if (!complete)
                 MainText.Text = safetext;
             else
+            {
+                SaveButton.IsEnabled = true;
                 safetext = MainText.Text;
+            }
+
             txtProgTimer.Text = Convert.ToString(progSetting);
             txtCountdown.Text = Convert.ToString(countSetting);
             txtProgTimer.IsEnabled = true;
