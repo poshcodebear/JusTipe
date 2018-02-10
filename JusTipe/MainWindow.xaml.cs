@@ -1,19 +1,9 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace JusTipe
@@ -24,15 +14,20 @@ namespace JusTipe
     public partial class MainWindow : Window
     {
         DispatcherTimer RunningTimer;
-
+        
         bool running;
         bool complete;
 
+        // Setting tracks what the user configured
+        // Current tracks the current project
+        // prog = Progress (countdown to complete a typing set)
         int progSetting;
         int progCurrent;
+        // count = Countdown (countdown until window clears without input)
         int countSetting;
         int countCurrent;
 
+        // Holds completed sets so failed sets don't clear them
         string safetext;
 
         public MainWindow()
@@ -44,8 +39,10 @@ namespace JusTipe
             progCurrent = progSetting;
             countCurrent = countSetting;
 
-            RunningTimer = new DispatcherTimer();
-            RunningTimer.Interval = new TimeSpan(10_000_000);
+            RunningTimer = new DispatcherTimer
+            {
+                Interval = new TimeSpan(10_000_000) // 10 million ticks = 1 second
+            };
             RunningTimer.Tick += new EventHandler(OnTick);
             running = false;
             complete = false;
@@ -63,6 +60,7 @@ namespace JusTipe
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // Allows window to be moved without window chrome
             DragMove();
         }
 
@@ -74,24 +72,28 @@ namespace JusTipe
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.DefaultExt = ".txt";
-            saveFileDialog.Filter = "Text document (.txt)|*.txt";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                DefaultExt = ".txt",
+                Filter = "Text document (.txt)|*.txt"
+            };
             if (saveFileDialog.ShowDialog() == true)
                 File.WriteAllText(saveFileDialog.FileName, MainText.Text);
         }
 
         private void MainText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (MainText.Text != "")
+            if (!string.IsNullOrEmpty(MainText.Text))
             {
                 if (running)
                 {
+                    // Currently running: reset countdown timer
                     countCurrent = countSetting;
                     txtCountdown.Text = Convert.ToString(countCurrent);
                 }
                 else
                 {
+                    // Not yet running: start a new set
                     running = true;
                     complete = false;
                     txtProgTimer.IsEnabled = false;
@@ -109,17 +111,21 @@ namespace JusTipe
 
         public void OnTick(object sender, EventArgs e)
         {
+            // OnTick should execute once per second to update counters and check if the set has completed or failed
             if (progCurrent <= 0)
             {
+                // Set has completed successfully
                 complete = true;
                 Clear(complete);
             }
             else if (countCurrent <= 0)
             {
+                // Countdown completed without input; set has failed
                 Clear(complete);
             }
             else
             {
+                // Update counters
                 progCurrent--;
                 countCurrent--;
                 txtProgTimer.Text = Convert.ToString(progCurrent);
@@ -129,6 +135,7 @@ namespace JusTipe
 
         public void Clear(bool complete)
         {
+            // Save text if completed; otherwise, clear the set
             if (!complete)
                 MainText.Text = safetext;
             else
@@ -137,6 +144,7 @@ namespace JusTipe
                 safetext = MainText.Text;
             }
 
+            // Reset and reenable config boxes and save button
             txtProgTimer.Text = Convert.ToString(progSetting);
             txtCountdown.Text = Convert.ToString(countSetting);
             txtProgTimer.IsEnabled = true;
